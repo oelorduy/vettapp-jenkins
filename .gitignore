@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+dist/
+dist-ssr/
+.env
+.env.*.local
+*.local
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# macOS
+.DS_Store
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Windows
+Thumbs.db
+Desktop.ini
