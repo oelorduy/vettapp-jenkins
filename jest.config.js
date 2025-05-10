@@ -8,4 +8,7 @@ module.exports = {
     "^.+\\.(js|jsx)$": "babel-jest"
   },
   testMatch: ["**/__tests__/**/*.js?(x)", "**/?(*.)+(spec|test).js?(x)"],
+  moduleNameMapper: {
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+  }
 };
