@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import Error from "./Error";
 import Paciente from "./Paciente";
 import React from "react";
 

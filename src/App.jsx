@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import React from "react";
 import Formulario from "./components/Formulario";
 import Header from "./components/Header";
 import ListadoPacientes from "./components/ListadoPacientes";
@@ -7,6 +8,7 @@ function App() {
   const [pacientes, setPacientes] = useState([]);
   const [paciente, setPaciente] = useState({});
 
+  // Recuperar pacientes del localStorage cuando el componente se monta
   useEffect(() => {
     const obtenerLS = () => {
       const pacientesLS = JSON.parse(localStorage.getItem("pacientes")) ?? [];
@@ -15,10 +17,14 @@ function App() {
     obtenerLS();
   }, []);
 
+  // Guardar pacientes en el localStorage cuando cambian
   useEffect(() => {
-    localStorage.setItem("pacientes", JSON.stringify(pacientes));
+    if (pacientes.length > 0) {
+      localStorage.setItem("pacientes", JSON.stringify(pacientes));
+    }
   }, [pacientes]);
 
+  // Función para eliminar un paciente
   const eliminarPaciente = (id) => {
     const pacientesActualizados = pacientes.filter(
       (paciente) => paciente.id !== id

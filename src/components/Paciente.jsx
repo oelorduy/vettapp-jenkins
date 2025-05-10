@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import Error from "./Error";
+import React from "react";
 export const Paciente = ({ paciente, setPaciente, eliminarPaciente }) => {
   const { nombre, propietario, email, fecha, observaciones, id } = paciente;
   const handleEliminar = () => {

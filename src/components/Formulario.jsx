@@ -18,7 +18,7 @@ export const Formulario = ({
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (Object.keys(paciente).length > 0) {
+    if (Object.keys(paciente || {}).length > 0) {
       setNombre(paciente.nombre);
       setPropietario(paciente.propietario);
       setEmail(paciente.email);
@@ -234,7 +234,9 @@ export const Formulario = ({
           id="agregar"
           type="submit"
           className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-all"
-          value={paciente.id ? "Editar paciente" : "Agregar paciente"}
+          
+          value={(paciente && paciente.id) ? "Editar paciente" : "Agregar paciente"}
+
         />
       </form>
     </div>
