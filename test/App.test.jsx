@@ -1,7 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import App from "../src/App"; // ajusta el path según tu estructura
+import userEvent from "@testing-library/user-event"; // Importar userEvent
+import App from "../src/App"; // Ajusta el path según tu estructura
 import '@testing-library/jest-dom';
+
 // Simular datos en localStorage antes de cada prueba
 beforeEach(() => {
   const pacientesMock = [
@@ -34,7 +36,9 @@ test("debe eliminar un paciente", async () => {
   render(<App />);
   const botonEliminar = screen.getByRole("button", { name: /eliminar/i });
   await userEvent.click(botonEliminar);
-  expect(screen.queryByText("Juan Pérez")).not.toBeInTheDocument();
+  await waitFor(() =>
+  expect(screen.queryByText("Juan Pérez")).not.toBeInTheDocument()
+);
 });
 
 test("debe editar un paciente", async () => {
@@ -76,13 +80,15 @@ test("debe agregar un nuevo paciente", async () => {
   expect(screen.getByText("2025-05-10")).toBeInTheDocument();
 });
 
-test("debe mostrar mensaje de error si se envía el formulario vacío", async () => {
+test('muestra mensaje de error si el formulario está vacío', async () => {
   render(<App />);
-  const btnSubmit = screen.getByRole("button", { name: /agregar paciente/i });
 
-  await userEvent.click(btnSubmit);
+  const boton = screen.getByRole('button', { name: /agregar paciente/i });
+  await userEvent.click(boton);
 
-  expect(
-    screen.getByText(/todos los campos son obligatorios/i)
-  ).toBeInTheDocument();
+  await waitFor(() =>
+    expect(
+      screen.getByText(/todos los campos son obligatorios/i)
+    ).toBeInTheDocument()
+  );
 });
