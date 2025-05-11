@@ -1,0 +1,12 @@
+version: '2'
+engines:
+  eslint:
+    enabled: true
+    channel: stable
+  duplication:
+    enabled: true
+
+exclude_paths:
+  - node_modules/
+  - dist/
+  - coverage/

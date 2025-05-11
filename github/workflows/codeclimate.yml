@@ -1,0 +1,27 @@
+# .github/workflows/codeclimate.yml
+name: CodeClimate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install
+      - run: npm test -- --coverage
+      - name: Upload coverage to Code Climate
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter format-coverage -t lcov -o codeclimate.json coverage/lcov.info
+          ./cc-test-reporter upload-coverage -r ${{ secrets.CC_TEST_REPORTER_ID }}
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.2358b304fed940cbfe672548e626362da47a9287996fc04fafa6bc19d5698a87 }}
