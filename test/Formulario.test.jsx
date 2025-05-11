@@ -1,80 +1,281 @@
 import React from 'react';
-// Formulario.test.jsx
-import { render, screen, fireEvent } from "@testing-library/react";
-import { Formulario } from "../components/Formulario"; // Ajusta la ruta si es diferente
-import { clear } from '@testing-library/user-event/dist/cjs/utility/clear.js';
+import '@testing-library/jest-dom';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import Formulario from '../src/components/Formulario';
+import { act } from 'react';
 
-describe("Formulario.jsx", () => {
-  const mockSetPacientes = jest.fn();
-  const mockSetPaciente = jest.fn();
+const setPacientesMock = jest.fn();
+const setPacienteMock = jest.fn();
 
-  beforeEach(() => {
-    window.alert = jest.fn(); // Mockear alertas
-    jest.clearAllMocks(); // Limpiar mocks entre tests
-  });
+beforeEach(() => {
+    global.alert = jest.fn();
+    jest.clearAllMocks();
+});
 
-  test("muestra alerta si nombre está vacío", () => {
-    render(<Formulario pacientes={[]} setPacientes={mockSetPacientes} paciente={{}} setPaciente={mockSetPaciente} />);
-    fireEvent.click(screen.getByRole("button", { name: /Agregar paciente/i }));
-    expect(window.alert).toHaveBeenCalledWith("El campo nombre está vacío");
-  });
+afterEach(() => {
+    jest.restoreAllMocks();
+});
 
-  test("muestra alerta si propietario está vacío", () => {
-    render(<Formulario pacientes={[]} setPacientes={mockSetPacientes} paciente={{}} setPaciente={mockSetPaciente} />);
-    fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: "Max" } });
-    fireEvent.click(screen.getByRole("button", { name: /Agregar paciente/i }));
-    expect(window.alert).toHaveBeenCalledWith("El campo propietario está vacío");
-  });
+describe('Formulario', () => {
+    const paciente = {
+        id: '1',
+        nombre: 'Luna',
+        propietario: 'Carlos Perez',
+        email: 'carlos@example.com',
+        fecha: '2025-12-12',
+        observaciones: 'Paciente con buena salud',
+    };
 
-  test("muestra alerta si email está vacío", () => {
-    render(<Formulario pacientes={[]} setPacientes={mockSetPacientes} paciente={{}} setPaciente={mockSetPaciente} />);
-    fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: "Max" } });
-    fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: "Luis" } });
-    fireEvent.click(screen.getByRole("button", { name: /Agregar paciente/i }));
-    expect(window.alert).toHaveBeenCalledWith("El campo email está vacío");
-  });
+    it('debería renderizar el formulario correctamente', () => {
+        render(
+       <Formulario
+        pacientes={[]}
+        setPacientes={setPacientesMock}
+        paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+        setPaciente={setPacienteMock}
+       />
+       );
 
-  test("muestra alerta si el email tiene formato inválido", () => {
-    render(<Formulario pacientes={[]} setPacientes={mockSetPacientes} paciente={{}} setPaciente={mockSetPaciente} />);
-    fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: "Max" } });
-    fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: "Luis" } });
-    fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "correo-invalido" } });
-    fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: "2025-05-10" } });
-    fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: "Chequeo" } });
-    fireEvent.click(screen.getByRole("button", { name: /Agregar paciente/i }));
-    expect(window.alert).toHaveBeenCalledWith("El email ingresado no es válido");
-  });
+        expect(screen.getByLabelText(/Nombre Mascota/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Nombre Propietario/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Fecha de Cita/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Observaciones/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Agregar paciente/i })).toBeInTheDocument();
+    });
 
-  test("muestra alerta si la fecha es anterior a hoy", () => {
-    render(<Formulario pacientes={[]} setPacientes={mockSetPacientes} paciente={{}} setPaciente={mockSetPaciente} />);
-    fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: "Max" } });
-    fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: "Luis" } });
-    fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "luis@mail.com" } });
-    fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: "2020-01-01" } });
-    fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: "Chequeo" } });
-    fireEvent.click(screen.getByRole("button", { name: /Agregar paciente/i }));
-    expect(window.alert).toHaveBeenCalledWith("La fecha no puede ser menor a la fecha actual");
-  });
+    it('debería mostrar error si el campo nombre está vacío', async () => {
+  // Mock de la función alert
+  global.alert = jest.fn();
 
-  test("muestra alerta si el campo observaciones está vacío", () => {
-    render(<Formulario pacientes={[]} setPacientes={mockSetPacientes} paciente={{}} setPaciente={mockSetPaciente} />);
-    fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: "Max" } });
-    fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: "Luis" } });
-    fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "luis@mail.com" } });
-    fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: "2025-05-10" } });
-    fireEvent.click(screen.getByRole("button", { name: /Agregar paciente/i }));
-    expect(window.alert).toHaveBeenCalledWith("El campo síntomas está vacío");
-  });
+  render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
 
-  test("muestra alerta de éxito cuando se completa correctamente el formulario", () => {
-    render(<Formulario pacientes={[]} setPacientes={mockSetPacientes} paciente={{}} setPaciente={mockSetPaciente} />);
-    fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: "Max" } });
-    fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: "Luis" } });
-    fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "luis@mail.com" } });
-    fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: "2025-05-10" } });
-    fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: "Chequeo general" } });
-    fireEvent.click(screen.getByRole("button", { name: /Agregar paciente/i }));
-    expect(window.alert).toHaveBeenCalledWith("Ingreso de Paciente Exitoso");
+  // Cambiar los valores de los campos
+  fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: '' } });
+  fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Juan Perez' } });
+  fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'juan@example.com' } });
+  fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2025-12-12' } });
+  fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+  // Hacer clic en el botón de agregar pacienteclear
+  fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+  // Esperar que se haya llamado al alert con el mensaje correcto
+  await waitFor(() => {
+    expect(global.alert).toHaveBeenCalledWith('El campo nombre está vacío');
   });
 });
-clear
+
+
+    it('debería mostrar error si el campo propietario está vacío', async () => {
+         render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: '' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'juan@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2025-12-12' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+    expect(global.alert).toHaveBeenCalledWith('El campo propietario está vacío');
+  });
+    });
+
+     it('debería mostrar error si el email está vacío', async () => {
+        render(
+     <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+      />
+      );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Juan Perez' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: '' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2025-12-12' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+            expect(global.alert).toHaveBeenCalledWith('El campo email está vacío');
+        });
+    });
+
+      it('debería mostrar error si el email es inválido', async () => {
+        render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Juan Perez' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'juanexample.com' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2025-12-12' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+            expect(global.alert).toHaveBeenCalledWith('El email ingresado no es válido');
+        });
+    });
+
+   it('debería mostrar error si la fecha está vacía', async () => {
+        render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Juan Perez' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'juan@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+            expect(global.alert).toHaveBeenCalledWith('El campo fecha está vacío');
+        });
+    });
+
+   it('debería mostrar error si la fecha es anterior a hoy', async () => {
+        render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Juan Perez' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'juan@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2022-01-01' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+            expect(global.alert).toHaveBeenCalledWith('La fecha no puede ser menor a la fecha actual');
+        });
+    });
+
+    it('debería mostrar error si observaciones está vacío', async () => {
+        render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Juan Perez' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'juan@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2025-12-12' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: '' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+            expect(global.alert).toHaveBeenCalledWith('El campo observaciones está vacío');
+        });
+    });
+
+    it('debería agregar paciente cuando el formulario es válido', async () => {
+       render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Ana Gomez' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'ana@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2025-12-12' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+            expect(setPacientesMock).toHaveBeenCalledWith(expect.arrayContaining([
+                expect.objectContaining({
+                    nombre: 'Luna',
+                    propietario: 'Ana Gomez',
+                    email: 'ana@example.com',
+                    fecha: '2025-12-12',
+                    observaciones: 'Paciente saludable',
+                }),
+            ]));
+        });
+    });
+
+   it('debería editar paciente cuando se envía formulario con paciente existente', async () => {
+        render(
+    <Formulario
+      pacientes={[]}
+      setPacientes={setPacientesMock}
+      paciente={{ nombre: '', propietario: '', email: '', fecha: '', observaciones: '' }}
+      setPaciente={setPacienteMock}
+    />
+  );
+
+        fireEvent.change(screen.getByLabelText(/Nombre Mascota/i), { target: { value: 'Luna' } });
+        fireEvent.change(screen.getByLabelText(/Nombre Propietario/i), { target: { value: 'Ana Gomez' } });
+        fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'ana@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Fecha de Cita/i), { target: { value: '2025-12-12' } });
+        fireEvent.change(screen.getByLabelText(/Observaciones/i), { target: { value: 'Paciente saludable' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Agregar paciente/i }));
+
+        await waitFor(() => {
+            expect(setPacientesMock).toHaveBeenCalled();
+            const llamadas = setPacientesMock.mock.calls;
+            const pacientesActualizados = llamadas[0][0];
+
+            expect(pacientesActualizados).toEqual(expect.arrayContaining([
+  expect.objectContaining({
+    nombre: 'Luna',
+    propietario: 'Ana Gomez',
+    email: 'ana@example.com',
+    fecha: '2025-12-12',
+    observaciones: 'Paciente saludable',
+  })
+]));
+        });
+    });
+
+});

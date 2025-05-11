@@ -14,9 +14,9 @@ export const Formulario = ({
   const [email, setEmail] = useState("");
   const [fecha, setFecha] = useState("");
   const [observaciones, setObservaciones] = useState("");
-
   const [error, setError] = useState(false);
 
+  // Rellenar los campos con los datos del paciente si es edición
   useEffect(() => {
     if (Object.keys(paciente || {}).length > 0) {
       setNombre(paciente.nombre);
@@ -30,80 +30,61 @@ export const Formulario = ({
   const generarId = () => {
     const random = Math.random().toString(36).substring(2);
     const fecha = Date.now().toString(36);
-
     return random + fecha;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validación del formulario
-   /* if ([nombre, propietario, email, fecha, sintomas].includes("")) {
-      console.log("Hay al menos un campo vacío");
+    // Validaciones
+    if (nombre.trim() === "") {
+      alert("El campo nombre está vacío");
       setError(true);
       return;
-    }*/
+    }
+    if (propietario.trim() === "") {
+      alert("El campo propietario está vacío");
+      setError(true);
+      return;
+    }
+    if (email.trim() === "") {
+      alert("El campo email está vacío");
+      setError(true);
+      return;
+    }
 
-      if (nombre.trim() === "") {
-        alert("El campo nombre está vacío");
-        console.log("El campo nombre está vacío");
-        setError(true);
-        return;
-      }
-      
-      if (propietario.trim() === "") {
-        alert("El campo propietario está vacío");
-        console.log("El campo propietario está vacío");
-        setError(true);
-        return;
-      }
-      
-      if (email.trim() === "") {
-        alert("El campo email está vacío");
-        console.log("El campo email está vacío");
-        setError(true);
-        return;
-      }
-
-      // Expresión regular para validar formato de email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailRegex.test(email)) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       alert("El email ingresado no es válido");
-      console.log("El email ingresado no es válido");
       setError(true);
       return;
-      }
-      
-      if (fecha.trim() === "") {
-        alert("El campo fecha está vacío");
-        console.log("El campo fecha está vacío");
-        setError(true);
-        return;
-      }
+    }
 
-      // Validar que la fecha no sea menor a hoy
-      const fechaIngresada = new Date(fecha);
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0); // Eliminar la hora para comparación exacta
+    if (fecha.trim() === "") {
+      alert("El campo fecha está vacío");
+      setError(true);
+      return;
+    }
 
-      if (fechaIngresada < hoy) {
+    const fechaIngresada = new Date(fecha);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    if (fechaIngresada < hoy) {
       alert("La fecha no puede ser menor a la fecha actual");
-      console.log("La fecha ingresada es menor que hoy");
       setError(true);
       return;
-      }
-      
-      if (observaciones.trim() === "") {
-        alert("El campo síntomas está vacío");
-        console.log("El campo síntomas está vacío");
-        setError(true);
-        return;
-      }
+    }
+
+    if (observaciones.trim() === "") {
+      alert("El campo observaciones está vacío");
+      setError(true);
+      return;
+    }
 
     setError(false);
-    alert("Ingreso de Paciente Exitoso");
-    // Objeto de paciente
+
+    // Crear objeto de paciente
     const objetoPaciente = {
       nombre,
       propietario,
@@ -112,6 +93,7 @@ export const Formulario = ({
       observaciones,
     };
 
+    // Si estamos editando un paciente, mantenemos el ID, si no, generamos uno nuevo
     if (paciente.id) {
       objetoPaciente.id = paciente.id;
       const pacientesActualizados = pacientes.map((pacienteState) =>
@@ -119,13 +101,13 @@ export const Formulario = ({
       );
 
       setPacientes(pacientesActualizados);
-      setPaciente({});
+      setPaciente({});  // Limpiamos el estado de paciente después de editar
     } else {
       objetoPaciente.id = generarId();
-      setPacientes([...pacientes, objetoPaciente]);
+      setPacientes([...pacientes, objetoPaciente]);  // Añadimos un nuevo paciente
     }
 
-    // Reiniciar el formulario
+    // Limpiar formulario
     setNombre("");
     setPropietario("");
     setEmail("");
@@ -136,22 +118,12 @@ export const Formulario = ({
   return (
     <div className="md:w-1/2 lg:w-2/5 mb-10 mx-5">
       <h2 className="font-black text-3xl text-center">Asignar Cita</h2>
-
       <p className="text-lg mt-5 text-center mb-10">
-        Añade Pacientes y{" "}
-        <span className="text-indigo-600 font-bold">Administralos</span>
+        Añade Pacientes y <span className="text-indigo-600 font-bold">Administralos</span>
       </p>
-
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-lg py-10 px-5"
-      >
-       
+      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg py-10 px-5">
         <div className="mb-5">
-          <label
-            htmlFor="mascota"
-            className="block text-gray-700 uppercase font-bold"
-          >
+          <label htmlFor="mascota" className="block text-gray-700 uppercase font-bold">
             Nombre Mascota
           </label>
           <input
@@ -165,10 +137,7 @@ export const Formulario = ({
         </div>
 
         <div className="mb-5">
-          <label
-            htmlFor="mascota"
-            className="block text-gray-700 uppercase font-bold"
-          >
+          <label htmlFor="propietario" className="block text-gray-700 uppercase font-bold">
             Nombre Propietario
           </label>
           <input
@@ -182,10 +151,7 @@ export const Formulario = ({
         </div>
 
         <div className="mb-5">
-          <label
-            htmlFor="mascota"
-            className="block text-gray-700 uppercase font-bold"
-          >
+          <label htmlFor="email" className="block text-gray-700 uppercase font-bold">
             Email
           </label>
           <input
@@ -199,10 +165,7 @@ export const Formulario = ({
         </div>
 
         <div className="mb-5">
-          <label
-            htmlFor="cita"
-            className="block text-gray-700 uppercase font-bold"
-          >
+          <label htmlFor="cita" className="block text-gray-700 uppercase font-bold">
             Fecha de Cita
           </label>
           <input
@@ -215,10 +178,7 @@ export const Formulario = ({
         </div>
 
         <div className="mb-5">
-          <label
-            htmlFor="observaciones"
-            className="block text-gray-700 uppercase font-bold"
-          >
+          <label htmlFor="observaciones" className="block text-gray-700 uppercase font-bold">
             Observaciones
           </label>
           <textarea
@@ -230,13 +190,11 @@ export const Formulario = ({
           />
         </div>
 
-          <input
+        <input
           id="agregar"
           type="submit"
           className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-all"
-          
-          value={(paciente && paciente.id) ? "Editar paciente" : "Agregar paciente"}
-
+          value={paciente && paciente.id ? "Editar paciente" : "Agregar paciente"}
         />
       </form>
     </div>
@@ -244,3 +202,4 @@ export const Formulario = ({
 };
 
 export default Formulario;
+

@@ -2,5 +2,5 @@ projectKey=citas-react
 serverUrl=http://localhost:9000
 serverVersion=25.5.0.107428
 dashboardUrl=http://localhost:9000/dashboard?id=citas-react
-ceTaskId=19191967-6dfd-4040-b868-a59352301d23
-ceTaskUrl=http://localhost:9000/api/ce/task?id=19191967-6dfd-4040-b868-a59352301d23
+ceTaskId=328afb62-0d1f-4850-b977-e9c56d8f0d73
+ceTaskUrl=http://localhost:9000/api/ce/task?id=328afb62-0d1f-4850-b977-e9c56d8f0d73
