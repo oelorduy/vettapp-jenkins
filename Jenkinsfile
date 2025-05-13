@@ -19,7 +19,7 @@ pipeline {
         stage('Test') {
             steps {
 
-                echo 'Ejecutando Pruebas automatizadas...'
+                echo 'Ejecutando Pruebas automatizadas..'
                 sh 'npx jest test/Formulario.test.jsx'
 
             }
