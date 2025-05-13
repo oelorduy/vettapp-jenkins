@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    docker {
+            image 'node:18' // o la versión que uses
+        }
 
     stages {
         stage('Checkout') {
