@@ -20,7 +20,7 @@ pipeline {
             steps {
 
                 echo 'Ejecutando Pruebas automatizadas...'
-                sh 'echo "Simulación de pruebas completadas Exitosamente"'
+                sh 'npx jest test/Formulario.test.jsx'
 
             }
         }
