@@ -8,11 +8,11 @@ pipeline {
             }
         }
     
-        stage('Build') {
+       stage('Instalar dependencias') {
             steps {
-               
-                echo 'Compilando el proyecto...'
-                sh 'echo "Simulación de la compilación exitosa"'
+                echo 'Instalando dependencias del proyecto...'
+                sh 'npm install'
+                sh 'npm install --save-dev jest-environment-jsdom'
             }
         }
 
