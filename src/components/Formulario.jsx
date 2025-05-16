@@ -16,7 +16,7 @@ export const Formulario = ({
   const [observaciones, setObservaciones] = useState("");
   const [error, setError] = useState(false);
 
-  // Rellenar los campos con los datos del paciente si es edicións
+  // Rellenar los campos con los datos del paciente si es edición
   useEffect(() => {
     if (Object.keys(paciente || {}).length > 0) {
       setNombre(paciente.nombre);
